@@ -307,7 +307,7 @@ class BrownCompleteness(Completeness):
                 for num in range(5):
                     if num == 0:
                         self.updates[sInd, num] = TL.int_comp[sInd]
-                    if not pInds.any():
+                    if len(pInds) == 0:
                         break
                     # find Eccentric anomaly
                     if num == 0:
