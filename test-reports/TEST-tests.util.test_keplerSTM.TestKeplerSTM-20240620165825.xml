@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<testsuite name="tests.util.test_keplerSTM.TestKeplerSTM-20240620165825" tests="6" time="0.047" failures="0" errors="1">
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indpropC" time="0.000"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indproppy" time="0.005"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_propC" time="0.024"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_prop_vallado" time="0.006"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_proppy" time="0.008"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_init" time="0.004">
+		<error type="AssertionError" message="True is not false"><![CDATA[Traceback (most recent call last):
+  File "/Users/maxzweig/research/EXOSIMS/tests/util/test_keplerSTM.py", line 168, in test_keplerSTM_init
+    self.assertFalse(ps3.havec)
+AssertionError: True is not false
+]]></error>
+	</testcase>
+	<system-out><![CDATA[]]></system-out>
+	<system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,12 +1,14 @@
 import astropy.constants as const
 import astropy.units as u
 import numpy as np
+from keplertools.keplerSTM import planSys
 
 from EXOSIMS.util.deltaMag import deltaMag
 from EXOSIMS.util.eccanom import eccanom
 from EXOSIMS.util.get_dirs import get_cache_dir
 from EXOSIMS.util.get_module import get_module
-from EXOSIMS.util.keplerSTM import planSys
+
+# from EXOSIMS.util.keplerSTM import planSys
 from EXOSIMS.util.vprint import vprint
 
 

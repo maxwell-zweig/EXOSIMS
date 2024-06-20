@@ -10,10 +10,11 @@ Michael Turmon, JPL, Apr. 2016
 """
 
 import unittest
-from EXOSIMS.util import keplerSTM, keplerSTM_indprop
+from EXOSIMS.util import keplerSTM_indprop
 import numpy as np
 from collections import namedtuple
 import sys
+import keplertools.keplerSTM as keplerSTM
 
 # These target values are pasted from printed output of Matlab test routine
 KnownResults = [
@@ -143,10 +144,11 @@ class TestKeplerSTM(unittest.TestCase):
         Test method: initialize all possible constructors and sanity check generated objects
         """
 
-        test_str = "EXOSIMS.util.KeplerSTM_C.CyKeplerSTM"
+        test_str_keplertools = "keplertools.CyKeplerSTM"
+        test_str_indprop = "EXOSIMS.util.KeplerSTM_C.CyKeplerSTM"
 
         ps = keplerSTM.planSys(np.random.randn(6), np.random.rand(1))
-        if test_str in sys.modules:
+        if test_str_keplertools in sys.modules:
             self.assertTrue(ps.havec)
         else:
             self.assertFalse(ps.havec)
@@ -161,7 +163,7 @@ class TestKeplerSTM(unittest.TestCase):
         self.assertEqual(ps2.nplanets, 1)
 
         ps3 = keplerSTM_indprop.planSys(np.random.randn(6), np.random.rand(1))
-        if test_str in sys.modules:
+        if test_str_indprop in sys.modules:
             self.assertTrue(ps3.havec)
         else:
             self.assertFalse(ps3.havec)

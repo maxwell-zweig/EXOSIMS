@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<testsuite name="tests.util.test_keplerSTM.TestKeplerSTM-20240620165354" tests="6" time="0.022" failures="0" errors="1">
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indpropC" time="0.000"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indproppy" time="0.008"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_propC" time="0.000"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_prop_vallado" time="0.003"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_proppy" time="0.009"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_init" time="0.002">
+		<error type="SystemExit" message="None"><![CDATA[Traceback (most recent call last):
+  File "/Users/maxzweig/research/EXOSIMS/tests/util/test_keplerSTM.py", line 151, in test_keplerSTM_init
+    quit()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/_sitebuiltins.py", line 26, in __call__
+    raise SystemExit(code)
+SystemExit: None
+]]></error>
+	</testcase>
+	<system-out><![CDATA[True
+]]></system-out>
+	<system-err><![CDATA[]]></system-err>
+</testsuite>

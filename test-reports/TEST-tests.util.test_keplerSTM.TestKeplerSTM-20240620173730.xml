@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<testsuite name="tests.util.test_keplerSTM.TestKeplerSTM-20240620173730" tests="6" time="0.024" failures="0" errors="0">
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indpropC" time="0.000"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_indproppy" time="0.005"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_init" time="0.001"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_propC" time="0.011"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_prop_vallado" time="0.003"/>
+	<testcase classname="tests.util.test_keplerSTM.TestKeplerSTM" name="test_keplerSTM_proppy" time="0.005"/>
+	<system-out><![CDATA[False
+]]></system-out>
+	<system-err><![CDATA[]]></system-err>
+</testsuite>
