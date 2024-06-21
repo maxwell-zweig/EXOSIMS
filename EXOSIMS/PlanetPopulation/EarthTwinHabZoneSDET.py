@@ -58,7 +58,13 @@ class EarthTwinHabZoneSDET(PlanetPopulation):
         Rr = self.Rprange.to("earthRad").value
         Rp = np.random.uniform(low=Rr[0], high=Rr[1], size=n) * u.earthRad
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp
 
     def dist_sma(self, a):
         """Probability density function for uniform semi-major axis distribution in AU

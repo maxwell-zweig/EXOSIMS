@@ -57,8 +57,8 @@ class TestKeplerLike1Methods(unittest.TestCase):
         self.dev_null.close()
         del self.fixture
 
-    def test_gen_mass(self):
-        r"""Test gen_mass method.
+    def test_gen_plan_params_mass(self):
+        r"""Test mass in gen_plan_params method.
 
         Approach: Ensures the output is set, of the correct type, length, and units.
         Check that returned values are nonnegative.  Check that, for this power law, there
@@ -67,7 +67,7 @@ class TestKeplerLike1Methods(unittest.TestCase):
 
         plan_pop = self.fixture
         n = 10000
-        masses = plan_pop.gen_mass(n)
+        masses = plan_pop.gen_plan_params(n)[-1]
 
         self.assertEqual(len(masses), n)
         self.assertTrue(np.all(masses.value >= 0))
@@ -82,7 +82,7 @@ class TestKeplerLike1Methods(unittest.TestCase):
         n_list_bad = [-1, "100", 22.5]
         for n in n_list_bad:
             with self.assertRaises(AssertionError):
-                masses = plan_pop.gen_mass(n)
+                masses = plan_pop.gen_plan_params(n)[-1]
 
     def test_gen_sma(self):
         r"""Test gen_sma method.

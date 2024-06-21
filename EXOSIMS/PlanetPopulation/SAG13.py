@@ -240,8 +240,9 @@ class SAG13(KeplerLike2):
         e = self.esigma * np.sqrt(-2.0 * np.log(C1 - C2 * np.random.uniform(size=n)))
         # generate albedo from semi-major axis
         p = self.PlanetPhysicalModel.calc_albedo_from_sma(a, self.prange)
+        Mp = self.PlanetPhysicalModel.calc_mass_from_radius(Rp).to("earthMass")
 
-        return a, e, p, Rp
+        return a, e, p, Rp, Mp
 
     def dist_sma_radius(self, a, R):
         """Joint probability density function for semi-major axis (AU) and

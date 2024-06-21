@@ -187,29 +187,69 @@ class KnownRVPlanets(KeplerLike1):
 
         """
         n = self.gen_input_check(n)
-        Mp = self.gen_mass(n)
+        Mp = self.gen_plan_params(n)[-1]
         Rp = self.PlanetPhysicalModel.calc_radius_from_mass(Mp).to("earthRad")
 
         return Rp
 
-    def gen_mass(self, n):
-        """Generate planetary mass values in Earth mass
+    def gen_plan_params(self, n):
+        """Generate semi-major axis (AU), eccentricity, geometric albedo, and
+        planetary radius (earthRad)
 
-        The mass is determined by sampling the RV mass distribution from
-        Cumming et al. 2010
+        Semi-major axis is distributed RV like with exponential decay.
+        Eccentricity is a Rayleigh distribution. Albedo is dependent on the
+        PlanetPhysicalModel but is calculated such that it is independent of
+        other parameters. Planetary radius comes from the Kepler observations.
 
         Args:
             n (integer):
                 Number of samples to generate
 
         Returns:
-            Mp (astropy Quantity array):
-                Planet mass values in units of Earth mass
+            tuple:
+            a (astropy Quantity array):
+                Semi-major axis in units of AU
+            e (float ndarray):
+                Eccentricity
+            p (float ndarray):
+                Geometric albedo
+            Rp (astropy Quantity array):
+                Planetary radius in units of earthRad
 
         """
         n = self.gen_input_check(n)
-        # unitless mass range
+        PPMod = self.PlanetPhysicalModel
+        # generate semi-major axis samples
+        a = self.gen_sma(n)
+        # check for constrainOrbits == True for eccentricity samples
+        # constant
+        C1 = np.exp(-self.erange[0] ** 2 / (2.0 * self.esigma**2))
+        ar = self.arange.to("AU").value
+        if self.constrainOrbits:
+            # restrict semi-major axis limits
+            arcon = np.array(
+                [ar[0] / (1.0 - self.erange[0]), ar[1] / (1.0 + self.erange[0])]
+            )
+            # clip sma values to sma range
+            sma = np.clip(a.to("AU").value, arcon[0], arcon[1])
+            # upper limit for eccentricity given sma
+            elim = np.zeros(len(sma))
+            amean = np.mean(ar)
+            elim[sma <= amean] = 1.0 - ar[0] / sma[sma <= amean]
+            elim[sma > amean] = ar[1] / sma[sma > amean] - 1.0
+            elim[elim > self.erange[1]] = self.erange[1]
+            elim[elim < self.erange[0]] = self.erange[0]
+            # constants
+            C2 = C1 - np.exp(-(elim**2) / (2.0 * self.esigma**2))
+            a = sma * u.AU
+        else:
+            C2 = self.enorm
+        e = self.esigma * np.sqrt(-2.0 * np.log(C1 - C2 * np.random.uniform(size=n)))
+        # generate albedo from semi-major axis
+        p = PPMod.calc_albedo_from_sma(a, self.prange)
+        # generate planetary radius
+        Rp = self.gen_radius(n)
         Mpr = self.Mprange.to("earthMass").value
         Mp = statsFun.simpSample(self.dist_mass, n, Mpr[0], Mpr[1]) * u.earthMass
 
-        return Mp
+        return a, e, p, Rp, Mp

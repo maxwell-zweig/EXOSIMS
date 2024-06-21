@@ -82,4 +82,10 @@ class EarthTwinHabZone2(EarthTwinHabZone1):
         # generate planetary radius
         Rp = np.ones((n,)) * u.earthRad
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp

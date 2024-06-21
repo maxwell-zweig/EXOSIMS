@@ -216,8 +216,13 @@ class DulzPlavchan(PlanetPopulation):
         e = self.esigma * np.sqrt(-2.0 * np.log(C1 - C2 * np.random.uniform(size=n)))
         # generate albedo from semi-major axis
         p = PPMod.calc_albedo_from_sma(a, self.prange)
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
 
-        return a, e, p, Rp
+        return a, e, p, Rp, Mp
 
     def gen_sma_radius(self, n):
         """

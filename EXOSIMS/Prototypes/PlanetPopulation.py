@@ -243,30 +243,6 @@ class PlanetPopulation(object):
 
         return int(n)
 
-    def gen_mass(self, n):
-        """Generate planetary mass values in units of Earth mass.
-
-        The prototype provides a log-uniform distribution between the minimum and
-        maximum values.
-
-        Args:
-            n (int):
-                Number of samples to generate
-
-        Returns:
-            ~astropy.units.Quantity(~numpy.ndarray(float)):
-                Planet mass values in units of Earth mass.
-
-        """
-        n = self.gen_input_check(n)
-        Mpr = self.Mprange.to("earthMass").value
-        Mp = (
-            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
-            * u.earthMass
-        )
-
-        return Mp
-
     def gen_angles(self, n, commonSystemPlane=False, commonSystemPlaneParams=None):
         """Generate inclination, longitude of the ascending node, and argument
         of periapse in degrees
@@ -405,7 +381,13 @@ class PlanetPopulation(object):
             * u.earthRad
         )
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp
 
     def dist_eccen_from_sma(self, e, a):
         """Probability density function for eccentricity constrained by

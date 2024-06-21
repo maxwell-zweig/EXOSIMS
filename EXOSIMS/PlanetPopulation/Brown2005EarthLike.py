@@ -92,7 +92,13 @@ class Brown2005EarthLike(PlanetPopulation):
         # generate planetary radius
         Rp = np.ones((n,)) * u.earthRad  # *self.RpEtoJ
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp
 
     def gen_radius_nonorm(self, n):
         """Generate planetary radius values in Earth radius.

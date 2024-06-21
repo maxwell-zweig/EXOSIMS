@@ -124,8 +124,9 @@ class AlbedoByRadius(SAG13):
         e = self.esigma * np.sqrt(-2.0 * np.log(C1 - C2 * np.random.uniform(size=n)))
         # generate albedo from planetary radius
         p = self.get_p_from_Rp(Rp)
+        Mp = self.PlanetPhysicalModel.calc_mass_from_radius(Rp).to("earthMass")
 
-        return a, e, p, Rp
+        return a, e, p, Rp, Mp
 
     def get_p_from_Rp(self, Rp):
         """Generate constant albedos for radius ranges

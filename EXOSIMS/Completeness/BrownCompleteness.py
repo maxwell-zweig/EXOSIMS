@@ -268,14 +268,13 @@ class BrownCompleteness(Completeness):
             # number of planets to simulate
             nplan = int(2e4)
             # sample quantities which do not change in time
-            a, e, p, Rp = PPop.gen_plan_params(nplan)
+            a, e, p, Rp, Mp = PPop.gen_plan_params(nplan)
             a = a.to("AU").value
             # sample angles
             I, O, w = PPop.gen_angles(nplan)
             I = I.to("rad").value
             O = O.to("rad").value
             w = w.to("rad").value
-            Mp = PPop.gen_mass(nplan)  # M_earth
             rmax = a * (1.0 + e)  # AU
             # sample quantity which will be updated
             M = np.random.uniform(high=2.0 * np.pi, size=nplan)

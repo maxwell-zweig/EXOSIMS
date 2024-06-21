@@ -118,7 +118,13 @@ class AlbedoByRadiusDulzPlavchan(DulzPlavchan):
         # generate albedo from planetary radius
         p = self.get_p_from_Rp(Rp)
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp
 
     def get_p_from_Rp(self, Rp):
         """Generate constant albedos for radius ranges

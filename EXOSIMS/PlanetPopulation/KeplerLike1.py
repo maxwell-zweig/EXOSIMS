@@ -23,19 +23,17 @@ class KeplerLike1(PlanetPopulation):
             Sigma value of Rayleigh distribution for eccentricity.
 
     Notes:
-    1. The gen_mass function samples the Radius and calculates the mass from
-    there.  Any user-set mass limits are ignored.
-    2. The gen_albedo function samples the sma, and then calculates the albedos
+    1. The gen_albedo function samples the sma, and then calculates the albedos
     from there. Any user-set albedo limits are ignored.
-    3. The Rprange is fixed to (1,22.6) R_Earth and cannot be overwritten by user
+    2. The Rprange is fixed to (1,22.6) R_Earth and cannot be overwritten by user
     settings (the JSON input will be ignored)
-    4. The radius piece-wise distribution (from Fressin et al 2012) provides
+    3. The radius piece-wise distribution (from Fressin et al 2012) provides
     the normalization required to get the proper overall eta.  The gen_radius
     method provided here normalizes in order to return exactly the number of
     samples requested.  A second method (gen_radius_nonorm) is provided for
     generating the simulated universe population. The latter assumes a poisson
     distribution for occurences in each bin.
-    5.  Eccentricity is assumed to be Rayleigh distributed with a user-settable
+    4.  Eccentricity is assumed to be Rayleigh distributed with a user-settable
     sigma parameter (defaults to value from Fressin et al 2012).
 
     """
@@ -208,27 +206,6 @@ class KeplerLike1(PlanetPopulation):
 
         return Rp * u.earthRad
 
-    def gen_mass(self, n):
-        """Generate planetary mass values in Earth Mass
-
-        The mass is determined by sampling the radius and then calculating the
-        mass from the physical model.
-
-        Args:
-            n (integer):
-                Number of samples to generate
-
-        Returns:
-            astropy Quantity array:
-                Planet mass values in units of Earth mass
-
-        """
-        n = self.gen_input_check(n)
-        Rp = self.gen_radius(n)
-        Mp = self.PlanetPhysicalModel.calc_mass_from_radius(Rp).to("earthMass")
-
-        return Mp
-
     def gen_plan_params(self, n):
         """Generate semi-major axis (AU), eccentricity, geometric albedo, and
         planetary radius (earthRad)
@@ -286,8 +263,9 @@ class KeplerLike1(PlanetPopulation):
         p = PPMod.calc_albedo_from_sma(a, self.prange)
         # generate planetary radius
         Rp = self.gen_radius(n)
+        Mp = self.PlanetPhysicalModel.calc_mass_from_radius(Rp).to("earthMass")
 
-        return a, e, p, Rp
+        return a, e, p, Rp, Mp
 
     def dist_sma(self, a):
         """Probability density function for semi-major axis in AU

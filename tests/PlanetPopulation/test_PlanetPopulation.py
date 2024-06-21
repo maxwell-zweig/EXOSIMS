@@ -480,7 +480,7 @@ class TestPlanetPopulation(unittest.TestCase):
                 if "gen_plan_params" in mod.__dict__:
                     with RedirectStreams(stdout=self.dev_null):
                         obj = mod(**self.spec)
-                    a, e, p, Rp = obj.gen_plan_params(num)
+                    a, e, p, Rp, Mp = obj.gen_plan_params(num)
                     # check each sampled parameter
                     self.assertEqual(
                         len(a),

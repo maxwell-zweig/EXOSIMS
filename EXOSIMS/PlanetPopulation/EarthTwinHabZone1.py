@@ -57,7 +57,13 @@ class EarthTwinHabZone1(PlanetPopulation):
         # generate samples of planetary radius
         Rp = np.ones((n,)) * u.earthRad
 
-        return a, e, p, Rp
+        Mpr = self.Mprange.to("earthMass").value
+        Mp = (
+            np.exp(np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=n))
+            * u.earthMass
+        )
+
+        return a, e, p, Rp, Mp
 
     def dist_sma(self, a):
         """Probability density function for uniform semi-major axis distribution in AU

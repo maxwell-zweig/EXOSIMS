@@ -346,11 +346,10 @@ class SimulatedUniverse(object):
             )
             self.setup_system_planes()
 
-            self.a, self.e, self.p, self.Rp = PPop.gen_plan_params(self.nPlans)
+            self.a, self.e, self.p, self.Rp, self.Mp = PPop.gen_plan_params(self.nPlans)
             if PPop.scaleOrbits:
                 self.a *= np.sqrt(TL.L[self.plan2star])
             self.gen_M0()  # initial mean anomaly
-            self.Mp = PPop.gen_mass(self.nPlans)  # mass
 
         if self.ZodiacalLight.commonSystemfEZ:
             self.ZodiacalLight.nEZ = self.ZodiacalLight.gen_systemnEZ(TL.nStars)

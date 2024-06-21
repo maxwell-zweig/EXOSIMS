@@ -24,19 +24,17 @@ class KeplerLike2(KeplerLike1):
             Sigma value of Rayleigh distribution for eccentricity.
 
     Notes:
-    1. The gen_mass function samples the Radius and calculates the mass from
-    there.  Any user-set mass limits are ignored.
-    2. The gen_albedo function samples the sma, and then calculates the albedos
+    1. The gen_albedo function samples the sma, and then calculates the albedos
     from there. Any user-set albedo limits are ignored.
-    3. The Rprange is fixed to (1,22.6) R_Earth and cannot be overwritten by user
+    2. The Rprange is fixed to (1,22.6) R_Earth and cannot be overwritten by user
     settings (the JSON input will be ignored)
-    4. The radius piece-wise distribution provides the normalization required to
+    3. The radius piece-wise distribution provides the normalization required to
     get the proper overall eta.  The gen_radius method provided here normalizes
     in order to return exactly the number of samples requested.  A second method
     (gen_radius_nonorm) is provided for generating the simulated universe
     population. The latter assumes a poisson distribution for occurences in each
     bin.
-    5.  Eccentricity is assumed to be Rayleigh distributed with a user-settable
+    4.  Eccentricity is assumed to be Rayleigh distributed with a user-settable
     sigma parameter (defaults to 0.25).
 
     """
