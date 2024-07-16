@@ -63,11 +63,20 @@ class SolarSystem(PlanetPopulation):
         R_orig = R_orig.to("earthRad")
         a_orig = a_orig.to("AU")
 
+        Mpr = self.Mprange.to("earthMass").value
+        Mp_orig = (
+            np.exp(
+                np.random.uniform(low=np.log(Mpr[0]), high=np.log(Mpr[1]), size=nPlans)
+            )
+            * u.earthMass
+        )
+
         # Tile them
         numTiles = int(nPlans / 8)
         R_tiled = np.tile(R_orig, (numTiles))
         a_tiled = np.tile(a_orig, (numTiles))
         p_tiled = np.tile(p_orig, (numTiles))
         e_tiled = np.tile(e_orig, (numTiles))
+        mp_tiled = np.tile(Mp_orig, (numTiles))
 
-        return a_tiled, e_tiled, p_tiled, R_tiled
+        return a_tiled, e_tiled, p_tiled, R_tiled, mp_tiled

@@ -3,6 +3,7 @@ This script generates the index of Pickles and BPGS spectral files for all avail
 spectral types. It shoudl not be needed for normal EXOSIMS operations, but is available
 if this index ever needs to be regenerated in the future.
 """
+
 import pkg_resources
 from astropy.io import fits
 from MeanStars import MeanStars
@@ -185,5 +186,5 @@ for s in missing_specs:
     # filter by luminosity class
     tmp3 = specclasses[specclasses[:, 2] == tmp[2]]
     # next get the closest numerical spectral class representation
-    row = tmp3[np.argmin(np.abs(tmp3[:,3] - tmp2))]
+    row = tmp3[np.argmin(np.abs(tmp3[:, 3] - tmp2))]
     print(f"{s} matched to {row[0]}{row[1]}{row[2]}")

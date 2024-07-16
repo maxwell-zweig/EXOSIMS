@@ -79,7 +79,7 @@
     "Observatory": "SotoStarshade_SKi",
     "TimeKeeping": " ",
     "PostProcessing": " ",
-    "Completeness": "GarrettCompleteness",
+    "Completeness": "Completeness",
     "TargetList": " ",
     "SimulatedUniverse": "KeplerLikeUniverse",
     "SurveySimulation": "linearJScheduler",

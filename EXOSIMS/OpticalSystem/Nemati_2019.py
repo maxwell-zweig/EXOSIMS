@@ -132,10 +132,8 @@ class Nemati_2019(Nemati):
                 "DisturbXSens_DisturbanceTable"
             ]
 
-            self.observingModes[amici_mode_index][
-                "DisturbXSens_DisturbanceTable"
-            ] = extractedCSVTable(
-                fname
+            self.observingModes[amici_mode_index]["DisturbXSens_DisturbanceTable"] = (
+                extractedCSVTable(fname)
             )  # Disturbance table on the Disturbance Sheet in Bijan2019 model
             self.observingModes[amici_mode_index]["DisturbanceCases"] = [
                 "rqt10hr",
@@ -191,9 +189,9 @@ class Nemati_2019(Nemati):
             fname4 = self.observingModes[amici_mode_index][
                 "DisturbXSens_SensitivityMUF"
             ]  # .csv #From SensitivityMUF!C3-G23
-            self.observingModes[amici_mode_index][
-                "DisturbXSens_SensitivityMUF"
-            ] = extractedCSVTable(fname4)
+            self.observingModes[amici_mode_index]["DisturbXSens_SensitivityMUF"] = (
+                extractedCSVTable(fname4)
+            )
             # Index Labels of Sensitivity MUF Table Columns
             # KEEPself.observingModes[amici_mode_index]['SensitivityCases'] =
             # ['Standard', 'Unity', 'MUF_o1', 'MUF_o2', 'MUF_o3']
@@ -219,10 +217,8 @@ class Nemati_2019(Nemati):
             fname6 = self.observingModes[amici_mode_index][
                 "DisturbXSens_AnnZoneMasterTable"
             ]  # .csv #From AnnZoneList!C2-O11
-            self.observingModes[amici_mode_index][
-                "DisturbXSens_AnnZoneMasterTable"
-            ] = extractedCSVTable(
-                fname6
+            self.observingModes[amici_mode_index]["DisturbXSens_AnnZoneMasterTable"] = (
+                extractedCSVTable(fname6)
             )  # DisturbXSens_AnnZoneMasterTable.csv
 
             # Load Initial Raw Contrast Table
@@ -240,10 +236,8 @@ class Nemati_2019(Nemati):
             fname8 = self.observingModes[amici_mode_index][
                 "DisturbXSens_NItoContrastTable"
             ]  # .csv #From NItoContrast!B2-N6 #DisturbXSens_NItoContrastTable.csv
-            self.observingModes[amici_mode_index][
-                "DisturbXSens_NItoContrastTable"
-            ] = extractedCSVTable(
-                fname8
+            self.observingModes[amici_mode_index]["DisturbXSens_NItoContrastTable"] = (
+                extractedCSVTable(fname8)
             )  # DisturbXSens_NItoContrastTable.csv
 
             # self.observingModes[amici_mode_index]['DisturbXSens_DisturbanceTable']
@@ -526,9 +520,11 @@ class Nemati_2019(Nemati):
                 )  # in units of lam/D
                 planetObservingWA = np.asarray(
                     [
-                        planetPositionalWA[i].value
-                        if planetPositionalWA[i] < DarkHoleOWA
-                        else (DarkHoleIWA + 0.8 * (DarkHoleOWA - DarkHoleIWA)).value
+                        (
+                            planetPositionalWA[i].value
+                            if planetPositionalWA[i] < DarkHoleOWA
+                            else (DarkHoleIWA + 0.8 * (DarkHoleOWA - DarkHoleIWA)).value
+                        )
                         for i in np.arange(len(planetPositionalWA))
                     ]
                 )  # Based on cell SNR!T52
@@ -738,16 +734,16 @@ class Nemati_2019(Nemati):
             # value of the core stability table
             if core_stability_x[-1] < positional_OWA:
                 if isinstance(positional_WA, np.ndarray):
-                    positional_WA[
-                        positional_WA > core_stability_x[-1]
-                    ] = core_stability_x[-1]
+                    positional_WA[positional_WA > core_stability_x[-1]] = (
+                        core_stability_x[-1]
+                    )
                 else:
                     positional_WA = min(positional_WA, core_stability_x[-1])
             if core_stability_x[0] > positional_IWA:
                 if isinstance(positional_WA, np.ndarray):
-                    positional_WA[
-                        positional_WA < core_stability_x[0]
-                    ] = core_stability_x[0]
+                    positional_WA[positional_WA < core_stability_x[0]] = (
+                        core_stability_x[0]
+                    )
                 else:
                     positional_WA = max(positional_WA, core_stability_x[0])
 
@@ -983,9 +979,7 @@ class Nemati_2019(Nemati):
         PC_eff_loss = 1 - np.exp(-PC_threshold / k_EM)
         eta_PC = 1 - PC_eff_loss  # PC Threshold Efficiency SNR!AJK45
         eta_HP = 1.0 - t_MF / 20.0  # SNR!AJ39
-        eta_CR = (
-            1.0 - (5 * (1 / u.s) * 1.7 * t_f) * L_CR / pixels_across**2
-        )  # SNR!AJ48
+        eta_CR = 1.0 - (5 * (1 / u.s) * 1.7 * t_f) * L_CR / pixels_across**2  # SNR!AJ48
         try:
             dqeFluxSlope, dqeKnee, dqeKneeFlux = self.get_csv_values(
                 det_filename, "CTE_dqeFluxSlope", "CTE_dqeKnee", "CTE_dqeKneeFlux"
