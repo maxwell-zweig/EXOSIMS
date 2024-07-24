@@ -150,8 +150,7 @@ class KulikStarshade(ObservatoryL2Halo):
                 STMmat = list(scipy.io.loadmat(STMFileName).values())[-1]
                 STTmat = list(scipy.io.loadmat(STTFileName).values())[-1]
                 # initialize object used for computation
-                self.orb = OrbitVariationalDataSecondOrder(STTmat, STMmat, trvmat, T, exponent)
-           
+                self.orb = OrbitVariationalDataSecondOrder(STTmat, STMmat, trvmat, T, exponent)        
             elif dynamics == 1:
                 pass
             elif dynamics == 2:
@@ -242,14 +241,41 @@ class KulikStarshade(ObservatoryL2Halo):
         else:
             raise Exception('Mode must be one of "energyOptimal" or "impuslive"')
 
-
-
-
-
-    def calculate_dV(self, TL, old_sInd, sInds, allowedSlewTimes, tmpCurrentTimeAbs):
+    def calculate_dV(self, TL, old_sInd, sInds, slewTimes, tmpCurrentTimeAbs):
         IWA = TL.OpticalSystem.IWA
         d = self.starShadeRad / math.tan(IWA)
-        
+
+
+        if old_sInd is None:
+            dV = np.zeros(slewTimes.shape)
+        else:
+            dV = np.zeros(slewTimes.shape)
+            badSlews_i, badSlew_j = np.where(slewTimes.value < self.occ_dtmin.value)
+            t0 = tmpCurrentTimeAbs
+
+            # gets inital target star positions in heliocentric ecliptic intertial frame
+            # TL.starprop handles a list of times
+            starPost0 = TL.starprop(sInds, t0, eclip=True)
+
+            # calculating starshade position at t0 in km, in inertial CRTBP frame
+            obsPost0 = self.orbit(t0, eclip=True)
+            starShadePost0Inert = obsPost0 + d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0)
+            starShadePost0rot = 
+
+
+            for t in range(len(slewTimes.T)):
+                for i in range(len(sInds)):
+                    # gets final target star positions in heliocentric ecliptic inertial frame 
+                    
+                    tf = tmpCurrentTimeAbs + slewTimes[i, t]
+                    starPostf = TL.starprop(sInds[i], tf)
+
+
+                    precomputeData = self.orb.precompute_lu(t0, tf)
+                    dV[i, t] = self.orb.solve_deltaV_convenience(precomputeData, r0rel, rfrel)
+            dV[badSlews_i, badSlew_j] = np.Inf
+
+        return dV * u.m / u.s
 
 
 
