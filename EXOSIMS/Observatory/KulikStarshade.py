@@ -45,7 +45,9 @@ class KulikStarshade(ObservatoryL2Halo):
         self.dynamics = dynamics
         self.exponent = exponent
         self.precompfname = precompfname
-        self.starShadeRad = starShadeRadius
+
+        # should be given in m -- converting to km 
+        self.starShadeRad = starShadeRadius / 1000 
 
         if mode=="energyOptimal":
             if dynamics == 0:
@@ -257,25 +259,47 @@ class KulikStarshade(ObservatoryL2Halo):
             # TL.starprop handles a list of times
             starPost0 = TL.starprop(sInds, t0, eclip=True)
 
-            # calculating starshade position at t0 in km, in inertial CRTBP frame
+            # calculating starshade position at t0 in au, in inertial CRTBP frame, units don't matter since normalizing to a unitvector 
             obsPost0 = self.orbit(t0, eclip=True)
-            starShadePost0Inert = obsPost0 + d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0)
-            starShadePost0rot = 
+            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0)
 
+            # converting t0 to CRTBP canonical time units --- going to need to implement a time shift to match Jackson's CRTBP implementation /w the one
+            # or calculate Halo Orbit positions by interpolating the state done in Jackson's code
+            # the units of starPostf and obPostf don't actually matter for this calculation, since we are normalizing 
+            period = 365.2515
+            canonical_unit = period / (2 * math.pi) # in days 
+            t0Can = t0 / canonical_unit
+
+
+            transformmat0 = np.array([[np.cos(t0Can), np.sin(t0Can), 0], [-np.sin(t0Can), np.cos(t0Can), 0], [0, 0, 1]])
+            starShadePost0SynRel = transformmat0 @ starShadePost0InertRel
+            
+            tfs = tmpCurrentTimeAbs + slewTimes
+            tfs_flattened = np.flatten(tfs)
+            starPosttfs = TL.starprop(sInds, tfs_flattened, eclip=True)
+            obsPosttfs = self.orbit(tfs_flattened, eclip=True)
 
             for t in range(len(slewTimes.T)):
                 for i in range(len(sInds)):
                     # gets final target star positions in heliocentric ecliptic inertial frame 
-                    
-                    tf = tmpCurrentTimeAbs + slewTimes[i, t]
-                    starPostf = TL.starprop(sInds[i], tf)
+                    starPostf = starPosttfs[t * len(sInds) + i]
+                    obsPostf = obsPosttfs[t * len(sInds) + i]
+                    starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf)
 
+                    transformmatf = np.array([[np.cos(t0Can), np.sin(t0Can), 0], [-np.sin(t0Can), np.cos(t0Can), 0], [0, 0, 1]])
+                    starShadePostfSynRel = transformmatf @ starShadePostfInertRel
 
-                    precomputeData = self.orb.precompute_lu(t0, tf)
-                    dV[i, t] = self.orb.solve_deltaV_convenience(precomputeData, r0rel, rfrel)
+                    tfCan = tfs_flattened[t * len(sInds) + i] / canonical_unit
+
+                    precomputeData = self.orb.precompute_lu(t0Can, tfCan)
+                    dV[i, t] = self.orb.solve_deltaV_convenience(precomputeData, starShadePost0SynRel, starShadePostfSynRel)
+            
             dV[badSlews_i, badSlew_j] = np.Inf
 
         return dV * u.m / u.s
+
+
+
 
 
 
