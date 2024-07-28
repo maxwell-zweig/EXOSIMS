@@ -27,7 +27,7 @@ class KulikStarshade(ObservatoryL2Halo):
     This class is implemented at L2 and contains all variables, functions,
     and integrators to calculate occulter dynamics.
     """
-    def __init__(self, orbit_datapath=None, mode="energyOptimal", dynamics=0, exponent=8, precompfname="haloImpulsive", starShadeRadius = 10, **specs):
+    def __init__(self, mode="energyOptimal", dynamics=0, exponent=8, precompfname="haloImpulsive", starShadeRadius = 10, **specs):
         """Initializes StarShade class. Checks if variational data has already been precomputed for given mode and dynamics.
 
         Args:

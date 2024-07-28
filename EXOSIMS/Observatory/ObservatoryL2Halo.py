@@ -8,6 +8,8 @@ import scipy.interpolate as interpolate
 import scipy.integrate as itg
 import pickle
 from scipy.io import loadmat
+import math 
+import scipy.io
 
 
 class ObservatoryL2Halo(Observatory):
@@ -21,9 +23,9 @@ class ObservatoryL2Halo(Observatory):
 
     """
 
-    def __init__(self, equinox=60575.25, haloStartTime=0, orbit_datapath=None, **specs):
+    def __init__(self, equinox=60575.25, haloStartTime=0, orbit_datapath=None, use_alt=False, **specs):
 
-        # run prototype constructor __init__
+        # run prototype constructor __init__    
         Observatory.__init__(self, **specs)
         self.haloStartTime = haloStartTime * u.d
 
@@ -76,6 +78,9 @@ class ObservatoryL2Halo(Observatory):
                 with open(orbit_datapath, "wb") as ff:
                     pickle.dump(halo, ff)
         # unpack orbit properties in heliocentric ecliptic frame
+
+        
+
         self.mu = halo["mu"][0][0]
         self.m1 = float(1 - self.mu)
         self.m2 = self.mu
@@ -83,6 +88,7 @@ class ObservatoryL2Halo(Observatory):
         self.t_halo = halo["t"][:, 0] / (2 * np.pi) * u.year  # 2\pi = 1 sideral year
         self.r_halo = halo["state"][:, 0:3] * u.AU
         self.v_halo = halo["state"][:, 3:6] * u.AU / u.year * (2.0 * np.pi)
+
         # position wrt Earth
         self.r_halo[:, 0] -= 1.0 * u.AU
 
@@ -99,7 +105,8 @@ class ObservatoryL2Halo(Observatory):
         self.L2_dist = halo["x_lpoint"][0][0] * u.AU
         self.r_halo_L2 = halo["state"][:, 0:3] * u.AU
         # position wrt L2
-        self.r_halo_L2[:, 0] -= self.L2_dist
+       # self.r_halo_L2[:, 0] -= self.L2_dist 
+       # self.r_halo_L2[:, 0] -= self.mu * u.AU
 
         # create new interpolant for CR3BP (years & AU units)
         self.r_halo_interp_L2 = interpolate.interp1d(
@@ -109,6 +116,20 @@ class ObservatoryL2Halo(Observatory):
         # update outspec with unique elements
         self._outspec["equinox"] = self.equinox.value[0]
         self._outspec["orbit_datapath"] = orbit_datapath
+
+        if use_alt:
+            self.mu = 3.00348e-6
+            self.m1 = float(1 - self.mu)
+            self.m2 = self.mu
+            self.period_halo = 3.1002569555488506 / (2 * np.pi)
+
+
+            fileName = "haloImpulsive"
+            trvFileName = f"./{fileName}_trvs.mat"
+            trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
+
+
+
 
     def orbit(self, currentTime, eclip=False):
         """Finds observatory orbit positions vector in heliocentric equatorial (default)
