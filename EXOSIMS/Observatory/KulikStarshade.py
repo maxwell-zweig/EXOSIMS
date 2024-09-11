@@ -27,7 +27,7 @@ class KulikStarshade(ObservatoryL2Halo):
     This class is implemented at L2 and contains all variables, functions,
     and integrators to calculate occulter dynamics.
     """
-    def __init__(self, mode="energyOptimal", dynamics=0, exponent=8, precompfname="haloImpulsive", starShadeRadius = 10, **specs):
+    def __init__(self, mode="impulsive", dynamics=0, exponent=10, precompfname="haloImpulsive", starShadeRadius = 10, **specs):
         """Initializes StarShade class. Checks if variational data has already been precomputed for given mode and dynamics.
 
         Args:
@@ -39,7 +39,7 @@ class KulikStarshade(ObservatoryL2Halo):
                 One of "energyOptimal" or "impulsive"
         """
         
-        ObservatoryL2Halo.__init__(self, **specs)
+        ObservatoryL2Halo.__init__(self, use_alt=True, **specs)
 
         self.mode = mode
         self.dynamics = dynamics
@@ -88,9 +88,9 @@ class KulikStarshade(ObservatoryL2Halo):
                     return variables, dynamics
            
                 fileName = self.precompfname
-                trvFileName = "./" + fileName + "_trvs.mat"
-                STMFileName = "./" + fileName + "_STMs.mat"
-                STTFileName = "./" + fileName + "_STTs.mat"
+                trvFileName =  fileName + "_trvs.mat"
+                STMFileName =  fileName + "_STMs.mat"
+                STTFileName =  fileName + "_STTs.mat"
                 # initial conditions for a sun-earth halo orbit
                 # with zero initial conditions for costates and energy
                 ics = [
@@ -154,11 +154,12 @@ class KulikStarshade(ObservatoryL2Halo):
                 # initialize object used for computation
                 self.orb = OrbitVariationalDataSecondOrder(STTmat, STMmat, trvmat, T, exponent)        
             elif dynamics == 1:
-                pass
+                raise Exception('Unimplemented')
             elif dynamics == 2:
-                pass
+                raise Exception('Unimplemented')
             elif dynamics == 3:
-                pass
+                raise Exception('Unimplemented')             
+
         elif mode=="impulsive":
             if dynamics == 0:
                 def optControlDynamics():
@@ -181,8 +182,8 @@ class KulikStarshade(ObservatoryL2Halo):
                 
                 # store precomputed data in the following files
                 fileName = self.precompfname
-                trvFileName = f"./{fileName}_trvs.mat"
-                STMFileName = f"./{fileName}_STMs.mat"
+                trvFileName = f"{fileName}_trvs.mat"
+                STMFileName = f"{fileName}_STMs.mat"
                 # initial conditions for a sun-earth halo orbit
                 # with zero initial conditions for costates and energy
                 ics = [
@@ -217,7 +218,7 @@ class KulikStarshade(ObservatoryL2Halo):
                             [0, t_step], curState, output="final", max_step=0.001
                         )
                         states.append(state)
-                        STMs.append(STM[:12, :12])
+                        STMs.append(STM[:6, :6])
                         curState = state
                     scipy.io.savemat(
                         trvFileName, {"trvs": np.hstack((np.transpose(np.array([tVals])), states))}
@@ -229,17 +230,15 @@ class KulikStarshade(ObservatoryL2Halo):
                 T = trvmat[-1, 0]
                 # Take off last element which is same as first element up to integration error tolerances (periodicity)
                 trvmat = trvmat[:-1]
-
-                STMmat = list(scipy.io.loadmat(STMFileName).values())[-1]
+                STMmat = list(scipy.io.loadmat("haloImpulsive_STMs.mat").values())[-1]
                 # initialize object used for computation
                 self.orb = OrbitVariationalDataFirstOrder(STMmat, trvmat, T, exponent)
-
             elif dynamics == 1:
-                pass
+                raise Exception('Unimplemented')
             elif dynamics == 2:
-                pass
+                raise Exception('Unimplemented')
             elif dynamics == 3:
-                pass
+                raise Exception('Unimplemented')      
         else:
             raise Exception('Mode must be one of "energyOptimal" or "impuslive"')
 
@@ -286,16 +285,18 @@ class KulikStarshade(ObservatoryL2Halo):
                     obsPostf = obsPosttfs[t * len(sInds) + i]
                     starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf)
 
-                    transformmatf = np.array([[np.cos(t0Can), np.sin(t0Can), 0], [-np.sin(t0Can), np.cos(t0Can), 0], [0, 0, 1]])
-                    starShadePostfSynRel = transformmatf @ starShadePostfInertRel
-
                     tfCan = tfs_flattened[t * len(sInds) + i] / canonical_unit
+
+                    transformmatf = np.array([[np.cos(tfCan), np.sin(tfCan), 0], [-np.sin(tfCan), np.cos(tfCan), 0], [0, 0, 1]])
+                    starShadePostfSynRel = transformmatf @ starShadePostfInertRel
 
                     precomputeData = self.orb.precompute_lu(t0Can, tfCan)
                     dV[i, t] = self.orb.solve_deltaV_convenience(precomputeData, starShadePost0SynRel, starShadePostfSynRel)
             
             dV[badSlews_i, badSlew_j] = np.Inf
 
+        print('ran')
+        quit()
         return dV * u.m / u.s
 
 

@@ -128,7 +128,34 @@ class ObservatoryL2Halo(Observatory):
             trvFileName = f"./{fileName}_trvs.mat"
             trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
 
+            trvmat = trvmat[:-1]
 
+            self.t_halo = trvmat[:, 0] * u.year
+            self.r_halo = trvmat[:, 1:4] * u.AU
+            self.v_halo = trvmat[:, 4:] * u.AU / u.year * (2.0 * np.pi)
+
+                # position wrt Earth
+            self.r_halo[:, 0] -= 1.0 * u.AU
+
+            # create interpolant for position (years & AU units)
+            self.r_halo_interp = interpolate.interp1d(
+                self.t_halo.value, self.r_halo.value.T, kind="linear"
+            )
+            # create interpolant for orbital velocity (years & AU/yr units)
+            self.v_halo_interp = interpolate.interp1d(
+                self.t_halo.value, self.v_halo.value.T, kind="linear"
+            )
+
+            # orbital properties used in Circular Restricted 3 Body Problem
+            self.L2_dist = halo["x_lpoint"][0][0] * u.AU
+            self.r_halo_L2 = trvmat[:, 1:4] * u.AU
+            # position wrt L2
+        # self.r_halo_L2[:, 0] -= self.L2_dist 
+
+            # create new interpolant for CR3BP (years & AU units)
+            self.r_halo_interp_L2 = interpolate.interp1d(
+                self.t_halo.value, self.r_halo_L2.value.T, kind="linear"
+            )
 
 
     def orbit(self, currentTime, eclip=False):
