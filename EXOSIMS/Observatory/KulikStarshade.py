@@ -246,7 +246,8 @@ class KulikStarshade(ObservatoryL2Halo):
     def calculate_dV(self, TL, old_sInd, sInds, slewTimes, tmpCurrentTimeAbs):
         IWA = TL.OpticalSystem.IWA
         d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  # confirm units 
-
+        
+        slewTimes += np.random.rand(slewTimes.shape[0], slewTimes.shape[1]) / 10000
         if old_sInd is None:
             dV = np.zeros(slewTimes.shape)
         else:
@@ -278,25 +279,18 @@ class KulikStarshade(ObservatoryL2Halo):
             starShadePost0SynRel = transformmat0 @ starShadePost0InertRel.squeeze() 
             
             tfs = tmpCurrentTimeAbs + slewTimes
-
             tfs_flattened = tfs.flatten()
             starPosttfs = TL.starprop(sInds, tfs_flattened, eclip=True)  # confirm flattening done correctly 
             # starposttfs is a num stars by num times by 3 array, unless all the times are the same 
             # starposttfs are units of parsecs, whereas absoervatory positions are in AU, this is getting normalized out anyways though 
             # fixing the output of starPosttfs if all times are the same -- TL.starprop is implemented in such a silly way 
-            if tfs_flattened.size > 1:
-                if np.all(tfs_flattened == tfs_flattened[0]):
-                    starPosttfsaux = np.zeros((slewTimes.shape[0], slewTimes.shape[1], 3))
-                    for i in range(slewTimes.shape[0]):
-                        for j in range(slewTimes.shape[1]):
-                            starPosttfsaux[i, j] = starPosttfs[i]
-                    starPosttfs = starPosttfsaux
+            
             # times are the same value so being reduced to a scalar 
             obsPosttfs = self.orbit(tfs_flattened, eclip=True)
             for t in range(slewTimes.shape[1]):
                 for i in range(slewTimes.shape[0]):
                     # gets final target star positions in heliocentric ecliptic inertial frame 
-                    starPostf = starPosttfs[i, t]
+                    starPostf = starPosttfs[i * slewTimes.shape[1] + t, i].value
                     obsPostf = obsPosttfs[i * slewTimes.shape[1] + t].value
 
                     starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf) * 6.68459e-9
