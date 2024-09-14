@@ -273,9 +273,7 @@ class KulikStarshade(ObservatoryL2Halo):
 
             t0Can = t0[0].value / canonical_unit  # confirm units
 
-            
             transformmat0 = np.array([[np.cos(t0Can), np.sin(t0Can), 0], [-np.sin(t0Can), np.cos(t0Can), 0], [0, 0, 1]])
-
             starShadePost0SynRel = transformmat0 @ starShadePost0InertRel.squeeze() 
             
             tfs = tmpCurrentTimeAbs + slewTimes
@@ -299,6 +297,7 @@ class KulikStarshade(ObservatoryL2Halo):
 
                     transformmatf = np.array([[np.cos(tfCan), np.sin(tfCan), 0], [-np.sin(tfCan), np.cos(tfCan), 0], [0, 0, 1]])
                     starShadePostfSynRel = transformmatf @ starShadePostfInertRel
+
 
                     precomputeData = self.orb.precompute_lu(t0Can, tfCan)
                     dV[i, t] = self.orb.solve_deltaV_convenience(precomputeData, starShadePost0SynRel, starShadePostfSynRel)
