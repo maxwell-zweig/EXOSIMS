@@ -45,6 +45,7 @@ class KnownRVPlanetsTargetList(TargetList):
         }
 
         # Enforce required planet population (KnownRVPlanets)
+        print(specs["modules"]["PlanetPopulation"])
         assert (
             specs["modules"]["PlanetPopulation"] == "KnownRVPlanets"
         ), "KnownRVPlanetsTargetList must use KnownRVPlanets population"

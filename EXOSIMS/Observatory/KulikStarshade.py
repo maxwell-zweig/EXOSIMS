@@ -17,6 +17,7 @@ import scipy
 from EXOSIMS.util.OrbitVariationalFirstOrder import OrbitVariationalDataFirstOrder
 from EXOSIMS.util.OrbitVariationalDataSecondOrder import OrbitVariationalDataSecondOrder
 import math
+from astropy import units as u 
 
 EPS = np.finfo(float).eps
 
@@ -244,48 +245,63 @@ class KulikStarshade(ObservatoryL2Halo):
 
     def calculate_dV(self, TL, old_sInd, sInds, slewTimes, tmpCurrentTimeAbs):
         IWA = TL.OpticalSystem.IWA
-        d = self.starShadeRad / math.tan(IWA)
-
+        d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  # confirm units 
 
         if old_sInd is None:
             dV = np.zeros(slewTimes.shape)
         else:
             dV = np.zeros(slewTimes.shape)
-            badSlews_i, badSlew_j = np.where(slewTimes.value < self.occ_dtmin.value)
+            if isinstance(slewTimes, u.Quantity):
+                badSlews_i, badSlew_j = np.where(slewTimes.value < self.occ_dtmin.value)  
+            else:
+                badSlews_i, badSlew_j = np.where(slewTimes < self.occ_dtmin.value)
             t0 = tmpCurrentTimeAbs
 
             # gets inital target star positions in heliocentric ecliptic intertial frame
             # TL.starprop handles a list of times
-            starPost0 = TL.starprop(sInds, t0, eclip=True)
+            starPost0 = TL.starprop(old_sInd, t0, eclip=True) # confirm units
 
             # calculating starshade position at t0 in au, in inertial CRTBP frame, units don't matter since normalizing to a unitvector 
-            obsPost0 = self.orbit(t0, eclip=True)
-            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0)
+            obsPost0 = self.orbit(t0, eclip=True) # confirm units
+            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0) # confirm units
 
             # converting t0 to CRTBP canonical time units --- going to need to implement a time shift to match Jackson's CRTBP implementation /w the one
             # or calculate Halo Orbit positions by interpolating the state done in Jackson's code
             # the units of starPostf and obPostf don't actually matter for this calculation, since we are normalizing 
-            period = 365.2515
-            canonical_unit = period / (2 * math.pi) # in days 
-            t0Can = t0 / canonical_unit
+            canonical_unit = 365.2515 / (2 * math.pi) # in days  # confirm units
 
+            t0Can = t0[0].value / canonical_unit  # confirm units
 
+            
             transformmat0 = np.array([[np.cos(t0Can), np.sin(t0Can), 0], [-np.sin(t0Can), np.cos(t0Can), 0], [0, 0, 1]])
-            starShadePost0SynRel = transformmat0 @ starShadePost0InertRel
+
+            starShadePost0SynRel = transformmat0 @ starShadePost0InertRel.squeeze() 
             
             tfs = tmpCurrentTimeAbs + slewTimes
-            tfs_flattened = np.flatten(tfs)
-            starPosttfs = TL.starprop(sInds, tfs_flattened, eclip=True)
-            obsPosttfs = self.orbit(tfs_flattened, eclip=True)
 
-            for t in range(len(slewTimes.T)):
-                for i in range(len(sInds)):
+            tfs_flattened = tfs.flatten()
+            starPosttfs = TL.starprop(sInds, tfs_flattened, eclip=True)  # confirm flattening done correctly 
+            # starposttfs is a num stars by num times by 3 array, unless all the times are the same 
+            # starposttfs are units of parsecs, whereas absoervatory positions are in AU, this is getting normalized out anyways though 
+            # fixing the output of starPosttfs if all times are the same -- TL.starprop is implemented in such a silly way 
+            if tfs_flattened.size > 1:
+                if np.all(tfs_flattened == tfs_flattened[0]):
+                    starPosttfsaux = np.zeros((slewTimes.shape[0], slewTimes.shape[1], 3))
+                    for i in range(slewTimes.shape[0]):
+                        for j in range(slewTimes.shape[1]):
+                            starPosttfsaux[i, j] = starPosttfs[i]
+                    starPosttfs = starPosttfsaux
+            # times are the same value so being reduced to a scalar 
+            obsPosttfs = self.orbit(tfs_flattened, eclip=True)
+            for t in range(slewTimes.shape[1]):
+                for i in range(slewTimes.shape[0]):
                     # gets final target star positions in heliocentric ecliptic inertial frame 
-                    starPostf = starPosttfs[t * len(sInds) + i]
-                    obsPostf = obsPosttfs[t * len(sInds) + i]
+                    starPostf = starPosttfs[i, t]
+                    obsPostf = obsPosttfs[i * slewTimes.shape[1] + t].value
+
                     starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf)
 
-                    tfCan = tfs_flattened[t * len(sInds) + i] / canonical_unit
+                    tfCan = tfs_flattened[i * slewTimes.shape[1] + t].value / canonical_unit
 
                     transformmatf = np.array([[np.cos(tfCan), np.sin(tfCan), 0], [-np.sin(tfCan), np.cos(tfCan), 0], [0, 0, 1]])
                     starShadePostfSynRel = transformmatf @ starShadePostfInertRel
@@ -295,13 +311,8 @@ class KulikStarshade(ObservatoryL2Halo):
             
             dV[badSlews_i, badSlew_j] = np.Inf
 
-        print('ran')
-        quit()
+            # must convert from AU / canonical time unit to m / s 
         return dV * u.m / u.s
-
-
-
-
 
 
 

@@ -8,6 +8,9 @@ import numpy as np
 trvFileName = "./" + "haloImpulsive" + "_trvs.mat"
 
 trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
+
+STMmat = list(scipy.io.loadmat("haloImpulsive_STMs.mat").values())[-1]
+
 # period
 T = trvmat[-1, 0]
 
@@ -28,6 +31,5 @@ print(canonical_unit * T)
 
 print(obs.haloVelocity(obs.equinox + canonical_unit * T).value / (2 * math.pi))
 print(obs.haloPosition(obs.equinox + canonical_unit * T))
-
 
 
