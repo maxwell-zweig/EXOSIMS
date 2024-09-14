@@ -263,7 +263,7 @@ class KulikStarshade(ObservatoryL2Halo):
 
             # calculating starshade position at t0 in au, in inertial CRTBP frame, units don't matter since normalizing to a unitvector 
             obsPost0 = self.orbit(t0, eclip=True) # confirm units
-            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0) # confirm units
+            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0) * 6.68459e-9
 
             # converting t0 to CRTBP canonical time units --- going to need to implement a time shift to match Jackson's CRTBP implementation /w the one
             # or calculate Halo Orbit positions by interpolating the state done in Jackson's code
@@ -299,7 +299,7 @@ class KulikStarshade(ObservatoryL2Halo):
                     starPostf = starPosttfs[i, t]
                     obsPostf = obsPosttfs[i * slewTimes.shape[1] + t].value
 
-                    starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf)
+                    starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf) * 6.68459e-9
 
                     tfCan = tfs_flattened[i * slewTimes.shape[1] + t].value / canonical_unit
 
@@ -312,7 +312,11 @@ class KulikStarshade(ObservatoryL2Halo):
             dV[badSlews_i, badSlew_j] = np.Inf
 
             # must convert from AU / canonical time unit to m / s 
-        return dV * u.m / u.s
+        au_to_m = u.au.to(u.m)
+        day_to_s = u.day.to(u.s)
+        dV = dV * u.AU / (365.2515 / (2 * math.pi) * u.day) 
+        dV = (dV * au_to_m / day_to_s).to(u.m / u.s)
+        return dV
 
 
 
