@@ -250,7 +250,7 @@ class KulikStarshade(ObservatoryL2Halo):
     def calculate_dV(self, TL, old_sInd, sInds, slewTimes, tmpCurrentTimeAbs):
         IWA = TL.OpticalSystem.IWA
         d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  # confirm units 
-        
+
         slewTimes += np.random.rand(slewTimes.shape[0], slewTimes.shape[1]) / 100000
         if old_sInd is None:
             dV = np.zeros(slewTimes.shape)
@@ -283,8 +283,6 @@ class KulikStarshade(ObservatoryL2Halo):
             starPosttfs = np.zeros(shape=(slewTimes.shape[0], slewTimes.shape[1], 3))
             for idx, ind in enumerate(sInds): 
                 starPosttfs[idx] = TL.starprop(ind, tfs[idx], eclip=True)
-            print(starPosttfs)
-            quit()
 
             obsPosttfs = self.orbit(tfs_flattened, eclip=True)
 
@@ -294,9 +292,6 @@ class KulikStarshade(ObservatoryL2Halo):
                     starPostf = starPosttfs[i,t]
                     obsPostf = obsPosttfs[i * slewTimes.shape[1] + t].value
 
-                    print('happy frog')
-                    print(starPostf)
-                    print(obsPostf)
 
                     starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf) * 6.68459e-9
 
