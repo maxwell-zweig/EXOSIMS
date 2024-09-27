@@ -1662,6 +1662,9 @@ class TargetList(object):
         # space velocity vector
         v = mu0 / self.parx[sInds] * u.AU + r0 * self.rv[sInds]
 
+        print(self.parx)
+        quit()
+
         # set J2000 epoch
         j2000 = Time(2000.0, format="jyear")
 
