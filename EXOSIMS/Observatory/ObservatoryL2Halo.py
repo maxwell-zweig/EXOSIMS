@@ -124,8 +124,8 @@ class ObservatoryL2Halo(Observatory):
             self.period_halo = 3.1002569555488506 / (2 * np.pi)
 
 
-            fileName = "haloImpulsive"
-            trvFileName = f"./{fileName}_trvs.mat"
+            fileName = "EXOSIMS/Observatory/haloImpulsive"
+            trvFileName = f"{fileName}_trvs.mat"
             trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
 
             trvmat = trvmat[:-1]

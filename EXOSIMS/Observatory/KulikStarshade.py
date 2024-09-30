@@ -28,7 +28,7 @@ class KulikStarshade(ObservatoryL2Halo):
     This class is implemented at L2 and contains all variables, functions,
     and integrators to calculate occulter dynamics.
     """
-    def __init__(self, mode="impulsive", dynamics=0, exponent=10, precompfname="haloImpulsive", starShadeRadius = 10, **specs):
+    def __init__(self, mode="impulsive", dynamics=0, exponent=8, precompfname="EXOSIMS/Observatory/haloImpulsive", starShadeRadius = 10, **specs):
         """Initializes StarShade class. Checks if variational data has already been precomputed for given mode and dynamics.
 
         Args:
@@ -117,7 +117,7 @@ class KulikStarshade(ObservatoryL2Halo):
                 exponent = self.exponent
 
                 # precompute variational data if data file does not already exist
-                print(os.path.isfile(trvFileName))
+                print(trvFileName)
                 if not os.path.isfile(trvFileName):
                     variables, dynamics = optControlDynamics()
                     cur_time = time.time()
@@ -150,7 +150,6 @@ class KulikStarshade(ObservatoryL2Halo):
                 trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
                 # period
                 T = trvmat[-1, 0]
-                print(T)
                 # Take off last element which is same as first element up to integration error tolerances (periodicity)
                 trvmat = trvmat[:-1]
 
@@ -228,6 +227,8 @@ class KulikStarshade(ObservatoryL2Halo):
                     scipy.io.savemat(
                         trvFileName, {"trvs": np.hstack((np.transpose(np.array([tVals])), states))}
                     )
+                    print(STMFileName)
+                    quit()
                     scipy.io.savemat(STMFileName, {"STMs": STMs})
                 # load data from file
                 trvmat = list(scipy.io.loadmat(trvFileName).values())[-1]
@@ -235,7 +236,7 @@ class KulikStarshade(ObservatoryL2Halo):
                 T = trvmat[-1, 0]
                 # Take off last element which is same as first element up to integration error tolerances (periodicity)
                 trvmat = trvmat[:-1]
-                STMmat = list(scipy.io.loadmat("haloImpulsive_STMs.mat").values())[-1]
+                STMmat = list(scipy.io.loadmat(STMFileName).values())[-1]
                 # initialize object used for computation
                 self.orb = OrbitVariationalDataFirstOrder(STMmat, trvmat, T, exponent)
             elif dynamics == 1:

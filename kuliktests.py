@@ -8,7 +8,7 @@ from astropy import units as u
 
 
 
-starshade = KulikStarshade.KulikStarshade(mode="impulsive", dynamics=0, exponent=8, precompfname="haloImpulsive", starShadeRadius = 27)
+starshade = KulikStarshade.KulikStarshade(mode="impulsive", dynamics=0, exponent=8, precompfname="EXOSIMS/Observatory/haloImpulsive", starShadeRadius = 27)
 starshadeSoto = SotoStarshade.SotoStarshade(f_nStars=101)
 
 targets = TargetList.TargetList(modules= {"StarCatalog": "EXOCAT1", "OpticalSystem": " ", "ZodiacalLight": "  ", "PostProcessing": " ", "Completeness": " ", "PlanetPopulation" : "KeplerLike1", "BackgroundSources" : " ", "PlanetPhysicalModel" : " "})
