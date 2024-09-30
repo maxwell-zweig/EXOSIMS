@@ -251,6 +251,8 @@ class KulikStarshade(ObservatoryL2Halo):
         IWA = TL.OpticalSystem.IWA
         d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  
 
+        d = self.occulterSep.value
+
         slewTimes += np.random.rand(slewTimes.shape[0], slewTimes.shape[1]) / 100000
         if old_sInd is None:
             dV = np.zeros(slewTimes.shape)
@@ -302,7 +304,6 @@ class KulikStarshade(ObservatoryL2Halo):
             dV[badSlews_i, badSlew_j] = np.Inf
 
             # must convert from AU / canonical time unit to m / s 
-
         return (dV * 149597870.7 * 1000 / ((365.2515 / (2 * math.pi))) / 86400)
 
 
