@@ -140,7 +140,6 @@ class SotoStarshade(ObservatoryL2Halo):
                 pickle.dump(B, ff)
             self.vprint("dV map computation completed in %s seconds." % (toc - tic))
             self.vprint("dV Map array stored in %r" % dVpath)
-
         return dVMap, angles, dt
 
     def boundary_conditions(self, rA, rB):
@@ -272,7 +271,6 @@ class SotoStarshade(ObservatoryL2Halo):
                 for t in range(len(slewTimes.T)):
                     dV[i, t] = self.dV_interp(slewTimes[i, t], sd[i].to("deg"))
             dV[badSlews_i, badSlew_j] = np.Inf
-
         return dV * u.m / u.s
 
     def impulsiveSlew_dV(self, dt, TL, nA, N, tA):

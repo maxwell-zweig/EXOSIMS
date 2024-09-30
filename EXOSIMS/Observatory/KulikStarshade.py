@@ -51,7 +51,7 @@ class KulikStarshade(ObservatoryL2Halo):
 
 
         # should be given in m -- converting to km 
-        self.starShadeRad = starShadeRadius / 1000 
+        self.starShadeRad = starShadeRadius / 1000
 
         if mode=="energyOptimal":
             if dynamics == 0:
@@ -249,7 +249,7 @@ class KulikStarshade(ObservatoryL2Halo):
 
     def calculate_dV(self, TL, old_sInd, sInds, slewTimes, tmpCurrentTimeAbs):
         IWA = TL.OpticalSystem.IWA
-        d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  # confirm units 
+        d = self.starShadeRad / math.tan(IWA.value * math.pi / (180 * 3600))  
 
         slewTimes += np.random.rand(slewTimes.shape[0], slewTimes.shape[1]) / 100000
         if old_sInd is None:
@@ -262,17 +262,11 @@ class KulikStarshade(ObservatoryL2Halo):
                 badSlews_i, badSlew_j = np.where(slewTimes < self.occ_dtmin.value)
             t0 = tmpCurrentTimeAbs
 
-            # gets inital target star positions in heliocentric ecliptic intertial frame
-            # TL.starprop handles a list of times
             starPost0 = TL.starprop(old_sInd, t0, eclip=True) # confirm units
 
-            # calculating starshade position at t0 in au, in inertial CRTBP frame, units don't matter since normalizing to a unitvector 
-            obsPost0 = self.orbit(t0, eclip=True) # confirm units
-            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0) * 6.68459e-9
+            obsPost0 = self.orbit(t0, eclip=True) 
+            starShadePost0InertRel = d * (starPost0 - obsPost0) / np.linalg.norm(starPost0 - obsPost0)
 
-            # converting t0 to CRTBP canonical time units --- going to need to implement a time shift to match Jackson's CRTBP implementation /w the one
-            # or calculate Halo Orbit positions by interpolating the state done in Jackson's code
-            # the units of starPostf and obPostf don't actually matter for this calculation, since we are normalizing 
 
             t0Can = self.abs_to_can(t0[0])
             starShadePost0SynRel = self.inert_to_syn(starShadePost0InertRel, t0Can)
@@ -292,9 +286,7 @@ class KulikStarshade(ObservatoryL2Halo):
                     starPostf = starPosttfs[i,t]
                     obsPostf = obsPosttfs[i * slewTimes.shape[1] + t].value
 
-
-                    starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf) * 6.68459e-9
-
+                    starShadePostfInertRel = d * (starPostf - obsPostf) / np.linalg.norm(starPostf - obsPostf)
                     tfCan = self.abs_to_can(tfs[i, t])
 
                     starShadePostfSynRel = self.inert_to_syn(starShadePostfInertRel, tfCan)
@@ -310,11 +302,8 @@ class KulikStarshade(ObservatoryL2Halo):
             dV[badSlews_i, badSlew_j] = np.Inf
 
             # must convert from AU / canonical time unit to m / s 
-        au_to_m = u.au.to(u.m)
-        day_to_s = u.day.to(u.s)
-        dV = dV * u.AU / (365.2515 / (2 * math.pi) * u.day) 
-        dV = (dV * au_to_m / day_to_s).to(u.m / u.s)
-        return dV
+
+        return (dV * 149597870.7 * 1000 / ((365.2515 / (2 * math.pi))) / 86400)
 
 
     def inert_to_syn(self, intertial_relative_pos, tcan):

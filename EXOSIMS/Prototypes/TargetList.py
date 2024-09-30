@@ -1347,7 +1347,6 @@ class TargetList(object):
 
     def nan_filter(self):
         """Filters out targets where required values are nan"""
-
         for att_name in self.required_catalog_atts:
             # treat sky coordinates differently form the other arrays
             if att_name == "coords":
@@ -1661,9 +1660,6 @@ class TargetList(object):
         mu0 = p0 * self.pmra[sInds] + q0 * self.pmdec[sInds]
         # space velocity vector
         v = mu0 / self.parx[sInds] * u.AU + r0 * self.rv[sInds]
-
-        print(self.parx)
-        quit()
 
         # set J2000 epoch
         j2000 = Time(2000.0, format="jyear")

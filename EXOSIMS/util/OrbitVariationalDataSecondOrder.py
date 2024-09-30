@@ -207,30 +207,7 @@ class OrbitVariationalDataSecondOrder:
         return en
 
 
-    def testingQuad(self):
-        print(self.findSTM(1 * self.T / (2 ** self.exponent), 4 * self.T / (2 ** self.exponent))[0])
-        quad, dts = self.fetchQuadV4(1 * self.T / (2 ** self.exponent), 4 * self.T / (2 ** self.exponent))
-        print()
-        quadAcc = np.identity(12)
-        if len(quad) > 1:
-            for idx in range(len(quad)):
-                quadAcc = quad[idx]@ quadAcc
-        else:
-            quadAcc = quad[0]
-        print(quadAcc)
 
-
-        #hard test
-
-        xl = np.array([0.1, -0.1, 2.0, 0.1, 0.2, 0.5, 0, 0, 0, 0, 0, 0])
-        print()
-        print(quadAcc @ xl)
-        print()
-
-        print(self.findSTM(1 * self.T / (2 ** self.exponent), 4 * self.T / (2 ** self.exponent))[0] @ xl)
-
-    # need to go back and confirm exactly how num_multiples is being claculted -- whether it is inclusive or exclusive of endpoints, but up to this it is correct
-    # proceeding for now and checking later 
     def fetchQuad(self, t0, tf):
         ts = np.array(self.ts)
         STMSS = np.array(self.STMs)
@@ -239,9 +216,6 @@ class OrbitVariationalDataSecondOrder:
         part_length = self.T / (2 ** self.exponent)
         num_parts = self.T // part_length
         num_multiples = math.floor(tf / part_length) - math.floor( t0 / part_length + 1) + 1
-      #  print(t0, tf)
-      #  print(tf % part_length)
-      #  print(part_length)
         if num_multiples == 0:
             quad = [self.findSTM(t0, tf)[0]]
             dts = [tf - t0]
@@ -260,9 +234,6 @@ class OrbitVariationalDataSecondOrder:
                 indics = indics % num_parts
                 quad = list(STMSS[indics.astype(int)])
                 dts = np.full_like(indics, part_length)
-            #    print(indics)
-                #intermediate_times = t0 + np.arange(0, num_multiples, 1) * part_length
-                #quad.insert(7, self.refinedList[-1][0])
             elif t0 % part_length <= 10e-12 and tf % part_length >= 10e-12:
                 first_idx = (int) ((t0 % self.T) // part_length)
                 indics = np.arange(0, num_multiples, 1)
@@ -273,7 +244,6 @@ class OrbitVariationalDataSecondOrder:
                 dts = np.full_like(indics, part_length)
                 dts = np.append(dts, tf - (t0 + num_multiples * part_length))
                 quad.append(self.findSTM(t0 + num_multiples * part_length, tf)[0])
-               # quad.insert(-3, self.refinedList[-1][0])
 
             elif t0 % part_length >= 10e-12 and tf % part_length <= 10e-12:
                 first_time = ((t0 + part_length) // part_length) * part_length
